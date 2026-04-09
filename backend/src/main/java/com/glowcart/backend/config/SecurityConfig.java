@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/webhooks/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
                 // Admin-only endpoints
