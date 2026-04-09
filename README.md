@@ -7,20 +7,32 @@ A full-stack, production-ready e-commerce platform for clean beauty products, bu
 ---
 ## 🖥️ Screenshots
 
-### Home Page
-![Home Page](docs/screenshots/home.png)
+## 🖥️ Screenshots
 
-### Product Catalog
-![Products](docs/screenshots/products.png)
-
-### Product Detail
-![Product Detail](docs/screenshots/product-detail.png)
-
-### Admin Dashboard
-![Admin Dashboard](docs/screenshots/admin.png)
-
-### Swagger API Documentation
-![Swagger](docs/screenshots/swagger.png)
+<table>
+  <tr>
+    <td><strong>Home Page</strong></td>
+    <td><strong>Product Catalog</strong></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/home.png" alt="Home Page" width="400"/></td>
+    <td><img src="docs/screenshots/products.png" alt="Products" width="400"/></td>
+  </tr>
+  <tr>
+    <td><strong>Product Detail</strong></td>
+    <td><strong>Admin Dashboard</strong></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/product-detail.png" alt="Product Detail" width="400"/></td>
+    <td><img src="docs/screenshots/admin.png" alt="Admin Dashboard" width="400"/></td>
+  </tr>
+  <tr>
+    <td colspan="2"><strong>Swagger API Documentation</strong></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/swagger.png" alt="Swagger" width="600"/></td>
+  </tr>
+</table>
 ---
 
 ## 🏗️ Architecture
