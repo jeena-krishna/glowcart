@@ -3,6 +3,7 @@ import { Heart, ShoppingBag, Star } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { wishlistAPI } from '../api/services'
+import ProductImage from './ProductImage'
 import toast from 'react-hot-toast'
 import { useState } from 'react'
 
@@ -10,7 +11,6 @@ export default function ProductCard({ product, onWishlistToggle }) {
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
   const [wishlisted, setWishlisted] = useState(product.wishlisted || false)
-  const [imgError, setImgError] = useState(false)
 
   const handleAddToCart = async (e) => {
     e.preventDefault()
@@ -39,18 +39,15 @@ export default function ProductCard({ product, onWishlistToggle }) {
     }
   }
 
-  const placeholderImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&size=300&background=F2E0DC&color=9E6B63&font-size=0.3`
-
   return (
     <Link to={`/products/${product.id}`} className="group">
       <div className="bg-surface rounded-2xl border border-border overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
         {/* Image */}
         <div className="relative aspect-square bg-rose-50 overflow-hidden">
-          <img
-            src={imgError ? placeholderImg : (product.imageUrl || placeholderImg)}
+          <ProductImage
+            src={product.imageUrl}
             alt={product.name}
-            onError={() => setImgError(true)}
-            className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full p-4 group-hover:scale-105 transition-transform duration-500"
           />
 
           {/* Wishlist Button */}

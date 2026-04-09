@@ -4,7 +4,7 @@ import { productAPI } from '../api/services'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { wishlistAPI } from '../api/services'
-import { Heart, ShoppingBag, Star, ArrowLeft, Minus, Plus, Loader2, Check, Sparkles } from 'lucide-react'
+import ProductImage from '../components/ProductImage'
 import toast from 'react-hot-toast'
 
 export default function ProductDetail() {
@@ -13,7 +13,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [wishlisted, setWishlisted] = useState(false)
-  const [imgError, setImgError] = useState(false)
+ 
   const [addingToCart, setAddingToCart] = useState(false)
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
@@ -77,8 +77,6 @@ export default function ProductDetail() {
     )
   }
 
-  const placeholderImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&size=500&background=F2E0DC&color=9E6B63&font-size=0.25`
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Back Button */}
@@ -90,12 +88,11 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Image */}
         <div className="bg-surface rounded-3xl border border-border overflow-hidden">
-          <div className="aspect-square bg-rose-50 flex items-center justify-center p-8">
-            <img
-              src={imgError ? placeholderImg : (product.imageUrl || placeholderImg)}
+          <div className="aspect-square bg-rose-50">
+            <ProductImage
+              src={product.imageUrl}
               alt={product.name}
-              onError={() => setImgError(true)}
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-full p-8"
             />
           </div>
         </div>

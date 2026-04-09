@@ -11,6 +11,7 @@ import Checkout from './pages/Checkout'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
 import { Sparkles, Truck, Shield, Leaf } from 'lucide-react'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
     </>
