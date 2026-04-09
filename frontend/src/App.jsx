@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import Layout from './components/Layout'
 
 function App() {
   return (
@@ -18,31 +19,31 @@ function App() {
           },
         }}
       />
-      <Routes>
-        <Route path="/" element={<TempHome />} />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<TempHome />} />
+        </Routes>
+      </Layout>
     </>
   )
 }
 
 function TempHome() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold text-text-primary mb-4">
-          GlowCart
-        </h1>
-        <p className="text-xl text-text-secondary font-sans">
-          Clean Beauty, Confident Glow
-        </p>
-        <div className="mt-8 flex gap-4 justify-center">
-          <button className="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-primary-dark transition-colors duration-200">
-            Shop Now
-          </button>
-          <button className="border border-primary text-primary px-8 py-3 rounded-full font-medium hover:bg-primary-light transition-colors duration-200">
-            Explore
-          </button>
-        </div>
+    <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+      <h1 className="text-5xl font-bold text-text-primary mb-4">
+        Discover Your Glow
+      </h1>
+      <p className="text-xl text-text-secondary mb-8">
+        Premium clean beauty products from the brands you love
+      </p>
+      <div className="flex gap-4 justify-center">
+        <a href="/products" className="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-primary-dark transition-colors duration-200">
+          Shop Now
+        </a>
+        <a href="/products?featured=true" className="border border-primary text-primary px-8 py-3 rounded-full font-medium hover:bg-primary-light transition-colors duration-200">
+          Featured
+        </a>
       </div>
     </div>
   )
