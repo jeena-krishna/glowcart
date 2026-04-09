@@ -4,6 +4,12 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Products from './pages/Products'
+import ProductDetail from './pages/ProductDetail'
+import Cart from './pages/Cart'
+import Wishlist from './pages/Wishlist'
+import Checkout from './pages/Checkout'
+import Orders from './pages/Orders'
+import OrderDetail from './pages/OrderDetail'
 import { Sparkles, Truck, Shield, Leaf } from 'lucide-react'
 
 function App() {
@@ -29,6 +35,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:id" element={<OrderDetail />} />
         </Routes>
       </Layout>
     </>
@@ -49,7 +61,7 @@ function Home() {
               Discover Your <span className="text-primary">Natural Glow</span>
             </h1>
             <p className="text-lg text-text-secondary mb-10 leading-relaxed">
-              Curated beauty essentials from 40+ premium brands. Cruelty-free, 
+              Curated beauty essentials from 40+ premium brands. Cruelty-free,
               ethically sourced, and made for every skin type.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -68,8 +80,6 @@ function Home() {
             </div>
           </div>
         </div>
-
-        {/* Decorative elements */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
       </section>
