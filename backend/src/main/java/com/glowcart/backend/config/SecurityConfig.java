@@ -38,9 +38,10 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints — anyone can access
+                // Public endpoints
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers("/api/health").permitAll()
+                .requestMatchers("/api/webhooks/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
                 // Admin-only endpoints
