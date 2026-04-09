@@ -4,7 +4,6 @@ A full-stack, production-ready e-commerce platform for clean beauty products, bu
 
 > **877 real beauty products** from 40+ brands including Maybelline, NYX, Clinique, Fenty, Dior, and more — powered by the Makeup API.
 
----
 
 ## 🖥️ Screenshots
 
