@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: glowcart-config
+  namespace: glowcart
+  labels:
+    app.kubernetes.io/name: glowcart
+data:
+  # Database
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-service:5432/glowcart_db"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+
+  # JWT
+  JWT_EXPIRATION: "86400000"
+
+  # Application
+  SERVER_PORT: "8080"
+  LOGGING_LEVEL_COM_GLOWCART: "INFO"
+
+  # Postgres
+  POSTGRES_DB: "glowcart_db"
