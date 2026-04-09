@@ -1,0 +1,65 @@
+services:
+  # ── PostgreSQL Database ──────────────────────────────────
+  postgres:
+    image: postgres:17-alpine
+    container_name: glowcart-db
+    environment:
+      POSTGRES_DB: glowcart_db
+      POSTGRES_USER: glowcart_user
+      POSTGRES_PASSWORD: glowcart_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glowcart_user -d glowcart_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - glowcart-network
+
+  # ── Spring Boot Backend ──────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: glowcart-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/glowcart_db
+      SPRING_DATASOURCE_USERNAME: glowcart_user
+      SPRING_DATASOURCE_PASSWORD: glowcart_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      JWT_EXPIRATION: 86400000
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_placeholder}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - glowcart-network
+    restart: unless-stopped
+
+  # ── React Frontend (Nginx) ──────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: glowcart-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - glowcart-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  glowcart-network:
+    driver: bridge
