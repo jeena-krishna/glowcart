@@ -93,4 +93,14 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         return UserMapper.toResponse(user);
     }
+
+    @Transactional
+    public UserResponse promoteToAdmin(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        user.setRole(com.glowcart.backend.entity.Role.ADMIN);
+        User saved = userRepository.save(user);
+        log.info("User {} promoted to ADMIN", email);
+        return UserMapper.toResponse(saved);
+    }
 }

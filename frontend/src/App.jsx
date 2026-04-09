@@ -17,6 +17,7 @@ import NotFound from './pages/NotFound'
 import ProductCard from './components/ProductCard'
 import { productAPI } from './api/services'
 import { Sparkles, Truck, Shield, Leaf, ArrowRight, Loader2 } from 'lucide-react'
+import Admin from './pages/Admin'
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
           <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
