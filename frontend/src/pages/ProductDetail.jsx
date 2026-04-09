@@ -4,6 +4,7 @@ import { productAPI } from '../api/services'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { wishlistAPI } from '../api/services'
+import { Heart, ShoppingBag, Star, ArrowLeft, Minus, Plus, Loader2, Check, Sparkles } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
 import toast from 'react-hot-toast'
 
@@ -13,7 +14,6 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [wishlisted, setWishlisted] = useState(false)
- 
   const [addingToCart, setAddingToCart] = useState(false)
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
@@ -99,17 +99,14 @@ export default function ProductDetail() {
 
         {/* Details */}
         <div className="flex flex-col">
-          {/* Brand */}
           <p className="text-sm text-text-muted uppercase tracking-widest mb-2">
             {product.brand || 'GlowCart'}
           </p>
 
-          {/* Name */}
           <h1 className="text-3xl font-bold text-text-primary mb-4">
             {product.name}
           </h1>
 
-          {/* Rating & Type */}
           <div className="flex items-center gap-4 mb-6">
             {product.rating && (
               <div className="flex items-center gap-1.5">
@@ -140,14 +137,12 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* Price */}
           <div className="mb-6">
             <span className="text-3xl font-bold text-text-primary">
               ${product.price?.toFixed(2)}
             </span>
           </div>
 
-          {/* Stock Status */}
           <div className="mb-6">
             {product.inStock ? (
               <div className="flex items-center gap-2 text-success">
@@ -159,10 +154,8 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* Quantity & Add to Cart */}
           {product.inStock && (
             <div className="flex items-center gap-4 mb-8">
-              {/* Quantity Selector */}
               <div className="flex items-center border border-border rounded-xl overflow-hidden">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -181,7 +174,6 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
                 disabled={addingToCart}
@@ -195,7 +187,6 @@ export default function ProductDetail() {
                 Add to Cart — ${(product.price * quantity).toFixed(2)}
               </button>
 
-              {/* Wishlist */}
               <button
                 onClick={handleToggleWishlist}
                 className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-colors ${
@@ -213,7 +204,6 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Description */}
           {product.description && (
             <div className="border-t border-border pt-6">
               <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">
@@ -227,7 +217,6 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Ingredients */}
           {product.ingredients && (
             <div className="border-t border-border pt-6 mt-6">
               <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">

@@ -1,6 +1,9 @@
 import { Routes, Route, Link } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useState, useEffect } from 'react'
 import Layout from './components/Layout'
+import ScrollToTop from './components/ScrollToTop'
+import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Products from './pages/Products'
@@ -10,8 +13,10 @@ import Wishlist from './pages/Wishlist'
 import Checkout from './pages/Checkout'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
-import { Sparkles, Truck, Shield, Leaf } from 'lucide-react'
 import NotFound from './pages/NotFound'
+import ProductCard from './components/ProductCard'
+import { productAPI } from './api/services'
+import { Sparkles, Truck, Shield, Leaf, ArrowRight, Loader2 } from 'lucide-react'
 
 function App() {
   return (
@@ -30,6 +35,7 @@ function App() {
           },
         }}
       />
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -37,11 +43,11 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+          <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
@@ -50,9 +56,31 @@ function App() {
 }
 
 function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState([])
+  const [newArrivals, setNewArrivals] = useState([])
+  const [loadingFeatured, setLoadingFeatured] = useState(true)
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const [featuredRes, newRes] = await Promise.all([
+          productAPI.getAll({ featured: true, size: 4, sortBy: 'rating', direction: 'desc' }),
+          productAPI.getAll({ size: 4, sortBy: 'name', direction: 'asc' }),
+        ])
+        setFeaturedProducts(featuredRes.data.content)
+        setNewArrivals(newRes.data.content)
+      } catch {
+        // silently fail
+      } finally {
+        setLoadingFeatured(false)
+      }
+    }
+    fetchProducts()
+  }, [])
+
   return (
     <>
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center max-w-2xl mx-auto">
@@ -67,16 +95,10 @@ function Home() {
               ethically sourced, and made for every skin type.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/products"
-                className="bg-primary text-white px-10 py-3.5 rounded-full font-medium hover:bg-primary-dark transition-colors duration-200 text-base"
-              >
+              <Link to="/products" className="bg-primary text-white px-10 py-3.5 rounded-full font-medium hover:bg-primary-dark transition-colors duration-200 text-base">
                 Shop All Products
               </Link>
-              <Link
-                to="/products?featured=true"
-                className="border border-border text-text-primary px-10 py-3.5 rounded-full font-medium hover:border-primary hover:text-primary transition-colors duration-200 text-base"
-              >
+              <Link to="/products?featured=true" className="border border-border text-text-primary px-10 py-3.5 rounded-full font-medium hover:border-primary hover:text-primary transition-colors duration-200 text-base">
                 View Featured
               </Link>
             </div>
@@ -110,48 +132,95 @@ function Home() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Featured Products */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-text-primary mb-3">Shop by Category</h2>
-          <p className="text-text-secondary">Find your perfect beauty essentials</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-text-primary">Featured Products</h2>
+            <p className="text-text-secondary mt-1">Top-rated picks our customers love</p>
+          </div>
+          <Link to="/products?featured=true" className="hidden sm:flex items-center gap-1 text-sm text-primary font-medium hover:text-primary-dark transition-colors">
+            View all <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {[
-            { name: 'Lipstick', type: 'lipstick', emoji: '💄' },
-            { name: 'Foundation', type: 'foundation', emoji: '✨' },
-            { name: 'Mascara', type: 'mascara', emoji: '👁️' },
-            { name: 'Blush', type: 'blush', emoji: '🌸' },
-            { name: 'Nail Polish', type: 'nail_polish', emoji: '💅' },
-            { name: 'Eyeshadow', type: 'eyeshadow', emoji: '🎨' },
-          ].map((cat) => (
-            <Link
-              key={cat.type}
-              to={`/products?type=${cat.type}`}
-              className="group bg-surface rounded-2xl border border-border p-6 text-center hover:border-primary hover:shadow-md hover:shadow-primary/5 transition-all duration-300"
-            >
-              <div className="text-3xl mb-3">{cat.emoji}</div>
-              <p className="text-sm font-medium text-text-primary group-hover:text-primary transition-colors">
-                {cat.name}
-              </p>
-            </Link>
-          ))}
+
+        {loadingFeatured ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+
+        <div className="sm:hidden mt-6 text-center">
+          <Link to="/products?featured=true" className="text-sm text-primary font-medium hover:text-primary-dark">
+            View all featured →
+          </Link>
         </div>
+      </section>
+
+      {/* Categories */}
+      <section className="bg-surface border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-text-primary mb-3">Shop by Category</h2>
+            <p className="text-text-secondary">Find your perfect beauty essentials</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { name: 'Lipstick', type: 'lipstick', emoji: '💄' },
+              { name: 'Foundation', type: 'foundation', emoji: '✨' },
+              { name: 'Mascara', type: 'mascara', emoji: '👁️' },
+              { name: 'Blush', type: 'blush', emoji: '🌸' },
+              { name: 'Nail Polish', type: 'nail_polish', emoji: '💅' },
+              { name: 'Eyeshadow', type: 'eyeshadow', emoji: '🎨' },
+            ].map((cat) => (
+              <Link
+                key={cat.type}
+                to={`/products?type=${cat.type}`}
+                className="group bg-background rounded-2xl border border-border p-6 text-center hover:border-primary hover:shadow-md hover:shadow-primary/5 transition-all duration-300"
+              >
+                <div className="text-3xl mb-3">{cat.emoji}</div>
+                <p className="text-sm font-medium text-text-primary group-hover:text-primary transition-colors">{cat.name}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* More Products */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-text-primary">Explore Our Collection</h2>
+            <p className="text-text-secondary mt-1">Discover something new for your beauty routine</p>
+          </div>
+          <Link to="/products" className="hidden sm:flex items-center gap-1 text-sm text-primary font-medium hover:text-primary-dark transition-colors">
+            Shop all <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {!loadingFeatured && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {newArrivals.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="bg-primary/5 rounded-3xl p-10 sm:p-16 text-center border border-primary/10">
-          <h2 className="text-3xl font-bold text-text-primary mb-4">
-            Ready to Find Your Glow?
-          </h2>
+          <h2 className="text-3xl font-bold text-text-primary mb-4">Ready to Find Your Glow?</h2>
           <p className="text-text-secondary mb-8 max-w-md mx-auto">
             Join thousands of beauty enthusiasts. Create your account today and get access to exclusive deals.
           </p>
-          <Link
-            to="/register"
-            className="inline-block bg-primary text-white px-10 py-3.5 rounded-full font-medium hover:bg-primary-dark transition-colors duration-200"
-          >
+          <Link to="/register" className="inline-block bg-primary text-white px-10 py-3.5 rounded-full font-medium hover:bg-primary-dark transition-colors duration-200">
             Create Free Account
           </Link>
         </div>

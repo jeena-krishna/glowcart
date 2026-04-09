@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { productAPI } from '../api/services'
 import ProductCard from '../components/ProductCard'
@@ -13,8 +13,9 @@ export default function Products() {
   const [brands, setBrands] = useState([])
   const [types, setTypes] = useState([])
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '')
+  const debounceRef = useRef(null)
 
-  // Read params from URL
   const page = parseInt(searchParams.get('page') || '0')
   const search = searchParams.get('search') || ''
   const brand = searchParams.get('brand') || ''
@@ -40,6 +41,10 @@ export default function Products() {
   }, [])
 
   useEffect(() => {
+    setSearchInput(search)
+  }, [search])
+
+  useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true)
       try {
@@ -62,18 +67,31 @@ export default function Products() {
     fetchProducts()
   }, [page, search, brand, type, featured, sortBy, direction])
 
-  const updateParam = (key, value) => {
+  const updateParams = (updates) => {
     const newParams = new URLSearchParams(searchParams)
-    if (value) {
-      newParams.set(key, value)
-    } else {
-      newParams.delete(key)
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+    if (!updates.hasOwnProperty('page')) {
+      newParams.set('page', '0')
     }
-    if (key !== 'page') newParams.set('page', '0')
     setSearchParams(newParams)
   }
 
+  const handleSearchInput = (value) => {
+    setSearchInput(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      updateParams({ search: value || null })
+    }, 400)
+  }
+
   const clearFilters = () => {
+    setSearchInput('')
     setSearchParams({})
   }
 
@@ -87,7 +105,7 @@ export default function Products() {
           <h1 className="text-3xl font-bold text-text-primary">
             {search ? `Results for "${search}"` :
              brand ? brand :
-             type ? type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) :
+             type ? type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) :
              featured ? 'Featured Products' :
              'All Products'}
           </h1>
@@ -97,14 +115,12 @@ export default function Products() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Sort */}
           <div className="relative">
             <select
               value={`${sortBy}-${direction}`}
               onChange={(e) => {
                 const [s, d] = e.target.value.split('-')
-                updateParam('sortBy', s)
-                updateParam('direction', d)
+                updateParams({ sortBy: s, direction: d, page: '0' })
               }}
               className="appearance-none bg-surface border border-border rounded-xl px-4 py-2 pr-8 text-sm text-text-primary focus:outline-none focus:border-primary cursor-pointer"
             >
@@ -117,7 +133,6 @@ export default function Products() {
             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
           </div>
 
-          {/* Filter Toggle */}
           <button
             onClick={() => setFiltersOpen(!filtersOpen)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors ${
@@ -128,9 +143,7 @@ export default function Products() {
           >
             <SlidersHorizontal className="w-4 h-4" />
             Filters
-            {hasActiveFilters && (
-              <span className="w-2 h-2 rounded-full bg-primary"></span>
-            )}
+            {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-primary"></span>}
           </button>
         </div>
       </div>
@@ -141,25 +154,20 @@ export default function Products() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-text-primary">Filters</h3>
             {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1"
-              >
-                <X className="w-3 h-3" />
-                Clear all
+              <button onClick={clearFilters} className="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1">
+                <X className="w-3 h-3" /> Clear all
               </button>
             )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Search */}
             <div>
               <label className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wider">Search</label>
               <div className="relative">
                 <input
                   type="text"
-                  value={search}
-                  onChange={(e) => updateParam('search', e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => handleSearchInput(e.target.value)}
                   placeholder="Search products..."
                   className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-primary"
                 />
@@ -167,37 +175,33 @@ export default function Products() {
               </div>
             </div>
 
-            {/* Brand Filter */}
             <div>
               <label className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wider">Brand</label>
               <div className="relative">
                 <select
                   value={brand}
-                  onChange={(e) => updateParam('brand', e.target.value)}
+                  onChange={(e) => updateParams({ brand: e.target.value || null })}
                   className="w-full appearance-none bg-background border border-border rounded-xl px-4 py-2 pr-8 text-sm text-text-primary focus:outline-none focus:border-primary cursor-pointer"
                 >
                   <option value="">All Brands</option>
-                  {brands.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
+                  {brands.map((b) => <option key={b} value={b}>{b}</option>)}
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
               </div>
             </div>
 
-            {/* Type Filter */}
             <div>
               <label className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wider">Product Type</label>
               <div className="relative">
                 <select
                   value={type}
-                  onChange={(e) => updateParam('type', e.target.value)}
+                  onChange={(e) => updateParams({ type: e.target.value || null })}
                   className="w-full appearance-none bg-background border border-border rounded-xl px-4 py-2 pr-8 text-sm text-text-primary focus:outline-none focus:border-primary cursor-pointer"
                 >
                   <option value="">All Types</option>
                   {types.map((t) => (
                     <option key={t} value={t}>
-                      {t.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {t.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </option>
                   ))}
                 </select>
@@ -217,12 +221,7 @@ export default function Products() {
         <div className="text-center py-20">
           <p className="text-xl text-text-secondary mb-2">No products found</p>
           <p className="text-sm text-text-muted mb-4">Try adjusting your search or filters</p>
-          <button
-            onClick={clearFilters}
-            className="text-sm text-primary font-medium hover:text-primary-dark"
-          >
-            Clear all filters
-          </button>
+          <button onClick={clearFilters} className="text-sm text-primary font-medium hover:text-primary-dark">Clear all filters</button>
         </div>
       ) : (
         <>
@@ -232,11 +231,10 @@ export default function Products() {
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-12">
               <button
-                onClick={() => updateParam('page', String(page - 1))}
+                onClick={() => updateParams({ page: String(page - 1) })}
                 disabled={page === 0}
                 className="px-4 py-2 rounded-xl border border-border text-sm font-medium text-text-secondary hover:border-primary hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
@@ -245,19 +243,14 @@ export default function Products() {
 
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 let pageNum
-                if (totalPages <= 5) {
-                  pageNum = i
-                } else if (page < 3) {
-                  pageNum = i
-                } else if (page > totalPages - 4) {
-                  pageNum = totalPages - 5 + i
-                } else {
-                  pageNum = page - 2 + i
-                }
+                if (totalPages <= 5) pageNum = i
+                else if (page < 3) pageNum = i
+                else if (page > totalPages - 4) pageNum = totalPages - 5 + i
+                else pageNum = page - 2 + i
                 return (
                   <button
                     key={pageNum}
-                    onClick={() => updateParam('page', String(pageNum))}
+                    onClick={() => updateParams({ page: String(pageNum) })}
                     className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
                       page === pageNum
                         ? 'bg-primary text-white'
@@ -270,7 +263,7 @@ export default function Products() {
               })}
 
               <button
-                onClick={() => updateParam('page', String(page + 1))}
+                onClick={() => updateParams({ page: String(page + 1) })}
                 disabled={page >= totalPages - 1}
                 className="px-4 py-2 rounded-xl border border-border text-sm font-medium text-text-secondary hover:border-primary hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
