@@ -5,13 +5,22 @@ A full-stack, production-ready e-commerce platform for clean beauty products, bu
 > **877 real beauty products** from 40+ brands including Maybelline, NYX, Clinique, Fenty, Dior, and more — powered by the Makeup API.
 
 ---
+## 🖥️ Screenshots
 
-## 🖥️ Live Preview
+### Home Page
+![Home Page](docs/screenshots/home.png)
 
-| Home Page | Product Detail | Admin Dashboard |
-|-----------|---------------|-----------------|
-| Hero section with featured products, categories, and trust badges | Full product page with add-to-cart, wishlist, and ingredient info | Product management table with CRUD operations |
+### Product Catalog
+![Products](docs/screenshots/products.png)
 
+### Product Detail
+![Product Detail](docs/screenshots/product-detail.png)
+
+### Admin Dashboard
+![Admin Dashboard](docs/screenshots/admin.png)
+
+### Swagger API Documentation
+![Swagger](docs/screenshots/swagger.png)
 ---
 
 ## 🏗️ Architecture
